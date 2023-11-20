@@ -216,6 +216,18 @@ async def save_group_settings(group_id, key, value):
     current[key] = value
     temp.SETTINGS[group_id] = current
     await db.update_settings(group_id, current)
+
+def get_wish():
+    tz = pytz.timezone('Asia/Colombo')
+    time = datetime.now(tz)
+    now = time.strftime("%H")
+    if now < "12":
+        status = "ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ 🌞"
+    elif now < "18":
+        status = "ɢᴏᴏᴅ ᴀꜰᴛᴇʀɴᴏᴏɴ 🌗"
+    else:
+        status = "ɢᴏᴏᴅ ᴇᴠᴇɴɪɴɢ 🌘"
+    return status
     
 def get_size(size):
     """Get size in readable format"""
