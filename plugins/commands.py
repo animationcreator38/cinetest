@@ -54,40 +54,31 @@ async def start(client, message):
                   InlineKeyboardButton('🤑 Eᴀʀɴ Mᴏɴᴇʏ Wɪᴛʜ Bᴏᴛ 💰', callback_data="earn_money")
                   ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        m=await message.reply_photo(
+        await message.reply_photo(
             photo=random.choice(PICS),
-            caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
+            caption=script.START_TXT.format(message.from_user.mention, get_wish()),
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
         return
-    
-    if AUTH_CHANNEL and not await is_subscribed(client, message):
-        try:
-            invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL))
-        except ChatAdminRequired:
-            logger.error("Make sure Bot is admin in Forcesub channel")
-            return
-        btn = [
-            [
-                InlineKeyboardButton(
-                    "📬 Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ 📬", url=invite_link.invite_link
-                )
-            ]
-        ]
 
-        if message.command[1] != "subscribe":
+    btn = await is_subscribed(client, message) # This func is for AUTH_CHANNEL
+    mc = message.command[1]
+    if btn:
+        if mc != 'subscribe':
             try:
-                kk, file_id = message.command[1].split("_", 1)
-                btn.append([InlineKeyboardButton("🗂️ Gᴇᴛ Mᴏᴠɪᴇ Fɪʟᴇ 🗂️", callback_data=f"checksub#{kk}#{file_id}")])
-            except (IndexError, ValueError):
-                btn.append([InlineKeyboardButton("🗂️ Gᴇᴛ Mᴏᴠɪᴇ Fɪʟᴇ 🗂️", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
-        await client.send_message(
-            chat_id=message.from_user.id,
-            text="**If you have not joined our Updates channel, follow the steps given by us, only then you will get your M0VlË file. \n𝙎𝙩𝙚𝙥:- 1. Join Updates Channel by clicking on 📬 Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ 📬 \n𝙎𝙩𝙚𝙥:-2. After joining Updates channel, click on 🗂️ Gᴇᴛ Mᴏᴠɪᴇ Fɪʟᴇ 🗂️, you will get your M0VlË file. \n\nआपने हमरा Updates channel join नही किए है हमारे दिए हुए steps follow करे तभी आपको आपकी मूवी फाइल मिलेंगी। \n𝙎𝙩𝙚𝙥:- 1. 📬 Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ 📬 पर click करके Updates Channel join करे। \n𝙎𝙩𝙚𝙥:-2. Updates channel join करने के बाद 🗂️ Gᴇᴛ Mᴏᴠɪᴇ Fɪʟᴇ 🗂️ पर click करे आपको आपकी मूवी फाइल मिल जायेगी।...**",
-            reply_markup=InlineKeyboardMarkup(btn),
-            parse_mode=enums.ParseMode.MARKDOWN
-            )
+                btn.append(
+                    [InlineKeyboardButton("🔁 Try Again 🔁", callback_data=f"pm_checksub#{mc}")]
+                )
+            except ButtonDataInvalid:
+                btn.append(
+                    [InlineKeyboardButton("🔁 Try Again 🔁", url=f"https://t.me/{temp.U_NAME}?start={mc}")]
+                )
+        await message.reply_photo(
+            photo=random.choice(PICS),
+            caption=f"👋 Hello {message.from_user.mention},\n\nPlease join my 'Updates Channel' and request again. 😇",
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
         return
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
         buttons = [[
